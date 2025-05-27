@@ -9,10 +9,26 @@ services:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         restart: unless-stopped
+        # networks:
+        #   - myapp_network
         volumes:
             - ./db_data:/var/lib/mysql
         ports:
             - 3306:3306
+    phpmyadmin: # <--- ADD THIS SERVICE
+        image: phpmyadmin/phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8080:80" # Access phpMyAdmin on http://localhost:8080
+        environment:
+            PMA_HOST: db         # Tells phpMyAdmin the MySQL server is at hostname 'db'
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Informs phpMyAdmin of the root password
+        depends_on:
+            - db
+        # networks:
+        #   - "myapp_network"
+        # driver: bridge
     web:
         build:
             context: .
